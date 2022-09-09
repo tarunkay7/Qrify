@@ -1,3 +1,4 @@
+
 body{
     background-color: #354259
 }
@@ -6,4 +7,87 @@ body{
 }
 .btn{
     background-color: #E94560;
+
 }
+.btn:hover{
+    background-color: #f05f77;
+}
+
+#submit{
+    border-radius: 30px;
+    background-color : rgb(67, 152, 192);
+    margin-left: 8px
+}
+#submit:hover{
+    background-color: rgb(45, 192, 192);
+    box-shadow: 0px 0px 10px 0px rgb(78, 131, 155)
+}
+#roll{
+    border-radius: 5px;
+    
+   
+}
+#roll:focus{
+    border-radius: 5px;
+    animation: box 0.5s linear;
+    box-shadow: 0px 0px 30px 0px rgb(81, 166, 206);
+
+   
+}
+td,th{
+    border-radius: 5px;
+}
+
+.center {
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background: #354259;
+  }
+  .wave {
+    width: 5px;
+    height: 100px;
+    background: linear-gradient(45deg, cyan, #fff);
+    margin: 10px;
+    animation: wave 1s linear infinite;
+    border-radius: 20px;
+  }
+  .wave:nth-child(2) {
+    animation-delay: 0.1s;
+  }
+  .wave:nth-child(3) {
+    animation-delay: 0.2s;
+  }
+  .wave:nth-child(4) {
+    animation-delay: 0.3s;
+  }
+  .wave:nth-child(5) {
+    animation-delay: 0.4s;
+  }
+  .wave:nth-child(6) {
+    animation-delay: 0.5s;
+  }
+
+
+  
+  @keyframes wave {
+    0% {
+      transform: scale(0);
+    }
+    50% {
+      transform: scale(1);
+    }
+    100% {
+      transform: scale(0);
+    }
+  }
+  @keyframes box {
+    0% {
+        box-shadow: 0px 0px 30px 0px rgb(51, 94, 114);
+      
+    }
+    100% {
+        box-shadow: 0px 0px 30px 0px rgb(81, 166, 206);
+    }
+  }
