@@ -29,7 +29,7 @@
             type="text/css"
             media="all"
         >
-        <title>Document</title>
+        <title>Event Registration</title>
     </head>
     <body>
         <div class="center">
@@ -47,6 +47,7 @@
       title = document.getElementById("qrtitle");
       let event = sessionStorage.getItem("eventName")
         title.innerText+=` x ${event}`;
+        document.getElementsByTagName("title")[0].innerText=`${event} Attendance`;
         alert("Do not the refresh the page or close the tab. You will loose all the data")
     });
         </script>
