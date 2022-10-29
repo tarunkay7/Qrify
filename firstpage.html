@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
     <head>
@@ -45,10 +46,16 @@
     $(window).on('load', function () {
       $(".center").fadeOut("slow");
       title = document.getElementById("qrtitle");
+      var storedArray = JSON.parse(sessionStorage.getItem("roll"));
+      var i;
+      for (i = 0; i < storedArray.length; i++) {
+             con(storedArray[i]);
+      }
+   
+
       let event = sessionStorage.getItem("eventName")
         title.innerText+=` x ${event}`;
         document.getElementsByTagName("title")[0].innerText=`${event} Attendance`;
-        alert("Do not the refresh the page or close the tab. You will loose all the data")
     });
         </script>
         <!-- Image and text -->
@@ -61,7 +68,7 @@
     </div>
     <div class="sides">
         <div class="leftside">
-            <video id="preview" width="550" height="400"></video>
+            <video id="preview" width="500" height="400""></video>
             <br>
             <div class="third">
                 <input
@@ -137,6 +144,7 @@
     function con(content) {
       if (!arr.includes(content)) {
         arr.push(content);
+        sessionStorage.setItem("roll", JSON.stringify(arr));
         let tbody = document.getElementById("body");
         let tablerow = document.createElement("tr");
         let thead = document.createElement("th");
@@ -176,7 +184,7 @@
 
       } 
       else {
-        alert("Already Entered Value");
+        alert("Already Entered value");
       }
     }
    

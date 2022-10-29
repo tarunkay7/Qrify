@@ -1,3 +1,101 @@
+
+*{
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Poppins', sans-serif;
+}
+
+body{
+    background: #f2f2f2;
+}
+
+.container{
+    max-width: 1300px;
+    background: #fff;
+    margin: 80px auto;
+    box-shadow: 0 15px 25px rgba(0,0,0,.05);
+    padding: 80px;
+    border-radius: 5px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.container .left{
+    flex: 0 0 45%;
+    padding-right: 80px;
+}
+
+.container .left h1{
+    font-size: 3rem;
+    font-weight: 600;
+    margin-bottom: 10px;
+}
+
+.container .left p{
+    color: #777;
+    line-height: 2;
+}
+
+.container .left .btn{
+    display: inline-block;
+    background: #ff523b;
+    color: #fff;
+    font-size: 1.1rem;
+    padding: 10px 30px;
+    text-decoration: none;
+    border-radius: 5px;
+    margin-top: 20px;
+}
+
+.container .right{
+    flex: 0 0 45%;
+}
+
+.container .right img{
+    width: 100%;
+}
+
+@media (max-width: 1000px){
+    .container{
+        flex-direction: column;
+        padding: 50px;
+    }
+
+    .container .left{
+        flex: 0 0 100%;
+        padding: 0;
+        margin-bottom: 50px;
+    }
+
+    .container .right{
+        flex: 0 0 100%;
+    }
+}
+
+@media (max-width: 600px){
+    .container .left h1{
+        font-size: 2rem;
+    }
+
+    .container .left .btn{
+        font-size: 1rem;
+        padding: 10px 20px;
+    }
+}
+
+/* Language: css */
+/* Path: style.css */
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap');
+
+body{
+    margin: 0;
+    padding: 0;
+    font-family: 'Poppins', sans-serif;
+}
+
+.navbar
 html{
   height:100%
 }

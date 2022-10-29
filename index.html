@@ -41,16 +41,20 @@
                 <h1>Qrify</h1>
             </div>
             <p>Attendance Simplified.</p>
-            <input
+            
+            <form action="firstpage.html">
+                <input
                 type="text"
                 id="input"
                 placeholder="   Enter Event Name"
                 style="border-radius:20px ;border: 0 0 0 0;"
+                required
             ></input>
-            <a href="" id="nxtpage">
-                <button id="letstart">
+                <button id="letstart" type = "submit">
                     <b>Lets Get Started!</b>
                 </button>
+            </form>
+                
             </a>
             <div class="maj">
                 <div class="ins">
@@ -110,9 +114,9 @@
                 }
                 else{
                     sessionStorage.setItem("eventName", eventName.value);
-                    nxt.href = "firstpage.html";
+                    nxt.href ="firstpage.html";
+                    
                 }
-                
             });
         </script>
     </body>
