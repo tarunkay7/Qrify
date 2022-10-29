@@ -108,6 +108,7 @@
           let eventName = document.querySelector("#input");
           let nxt = document.querySelector("#nxtpage");
           let button = document.querySelector("#letstart");
+          sessionStorage.setItem("eventName", eventName.value);
             button.addEventListener("click", function () {
                 if(eventName.value == ""){
                     alert("Please Enter the Event Name");
@@ -118,6 +119,7 @@
                     
                 }
             });
+            
         </script>
     </body>
 </html>

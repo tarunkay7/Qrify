@@ -46,6 +46,9 @@
     $(window).on('load', function () {
       $(".center").fadeOut("slow");
       title = document.getElementById("qrtitle");
+      let event = sessionStorage.getItem("eventName")
+        title.innerText+=` x ${event}`;
+        document.getElementsByTagName("title")[0].innerText=`${event} Attendance`;
       var storedArray = JSON.parse(sessionStorage.getItem("roll"));
       var i;
       for (i = 0; i < storedArray.length; i++) {
@@ -53,9 +56,7 @@
       }
    
 
-      let event = sessionStorage.getItem("eventName")
-        title.innerText+=` x ${event}`;
-        document.getElementsByTagName("title")[0].innerText=`${event} Attendance`;
+     
     });
         </script>
         <!-- Image and text -->
