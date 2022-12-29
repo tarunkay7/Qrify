@@ -30,6 +30,8 @@
             type="text/css"
             media="all"
         >
+        <script src="https://raw.githack.com/cozmo/jsQR/master/jsQR.js"></script>
+
         <title>Event Registration</title>
     </head>
     <body>
@@ -137,19 +139,30 @@
 
 
 
-    let scanner = new Instascan.Scanner({ video: document.getElementById("preview"), });
-    scanner.addListener("scan", con);
-    Instascan.Camera.getCameras()
-      .then(function (cameras) {
-        if (cameras.length > 0) {
-          scanner.start(cameras[0]);
-        } else {
-          console.error("No cameras found.");
-        }
-      })
-      .catch(function (e) {
-        console.error(e);
-      });
+
+  var video = document.getElementById('video');
+var canvasElement = document.getElementById('canvas');
+var canvas = canvasElement.getContext('2d');
+
+function scanQR() {
+  if (video.readyState === video.HAVE_ENOUGH_DATA) {
+    canvasElement.height = video.videoHeight;
+    canvasElement.width = video.videoWidth;
+    canvas.drawImage(video, 0, 0, canvasElement.width, canvasElement.height);
+    var imageData = canvas.getImageData(0, 0, canvasElement.width, canvasElement.height);
+    var cont = jsQR(imageData.data, imageData.width, imageData.height);
+    var content = cont.data
+    if (cont) {
+      console.log(content);
+    }
+  }
+  requestAnimationFrame(scanQR);
+}
+
+video.addEventListener('canplay', function() {
+  scanQR();
+});
+
     let count = 0;
     let arr = [];
 
