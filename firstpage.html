@@ -128,41 +128,23 @@
     }
 
 
-    navigator.mediaDevices.getUserMedia({ video: { facingMode: { exact: "environment" } } })
-  .then(function(stream) {
-    var video = document.getElementById('preview');
-    video.srcObject = stream;
-  })
-  .catch(function(error) {
-    // Handle error
-  });
+   
 
 
 
-
-  var video = document.getElementById('video');
-var canvasElement = document.getElementById('canvas');
-var canvas = canvasElement.getContext('2d');
-
-function scanQR() {
-  if (video.readyState === video.HAVE_ENOUGH_DATA) {
-    canvasElement.height = video.videoHeight;
-    canvasElement.width = video.videoWidth;
-    canvas.drawImage(video, 0, 0, canvasElement.width, canvasElement.height);
-    var imageData = canvas.getImageData(0, 0, canvasElement.width, canvasElement.height);
-    var cont = jsQR(imageData.data, imageData.width, imageData.height);
-    var content = cont.data
-    if (cont) {
-      console.log(content);
-    }
-  }
-  requestAnimationFrame(scanQR);
-}
-
-video.addEventListener('canplay', function() {
-  scanQR();
-});
-
+    let scanner = new Instascan.Scanner({ video: document.getElementById("preview"), });
+    scanner.addListener("scan", con);
+    Instascan.Camera.getCameras()
+      .then(function (cameras) {
+        if (cameras.length > 0) {
+          scanner.start(cameras[0]);
+        } else {
+          console.error("No cameras found.");
+        }
+      })
+      .catch(function (e) {
+        console.error(e);
+      });
     let count = 0;
     let arr = [];
 
