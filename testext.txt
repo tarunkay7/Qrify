@@ -1,0 +1,9 @@
+function download_txt() {
+      var textToSave = `${document.getElementById("qrtitle").innerText}\n\n${document.getElementById("body").innerText}`
+      var titles = document.getElementById("rowheads").innerText;
+      var hiddenElement = document.createElement("a");
+      hiddenElement.href = "data:attachment/text," + encodeURI(textToSave);
+      hiddenElement.target = "_blank";
+      hiddenElement.download = "Event_Data.txt";
+      hiddenElement.click();
+    }

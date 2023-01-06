@@ -33,6 +33,7 @@
         <script src="https://raw.githack.com/cozmo/jsQR/master/jsQR.js"></script>
 
         <title>Event Registration</title>
+        <script src="table2excel.js"></script>" 
     </head>
     <body>
         <div class="center">
@@ -150,7 +151,11 @@
 
     function con(content) {
       if (!arr.includes(content)) {
+        beep();
+        
+      
         arr.push(content);
+        
         sessionStorage.setItem("roll", JSON.stringify(arr));
         let tbody = document.getElementById("body");
         let tablerow = document.createElement("tr");
@@ -173,6 +178,8 @@
           return yearofjoin;
 
         };
+        // Get a reference to the table
+
 
         
         Department.innerText = `${dept(content.slice(4, 6))}`;
@@ -194,18 +201,19 @@
         alert("Already Entered value");
       }
     }
-   
 
-    function download_txt() {
-      var textToSave = `${document.getElementById("qrtitle").innerText}\n\n${document.getElementById("body").innerText}`
-      var titles = document.getElementById("rowheads").innerText;
-      var hiddenElement = document.createElement("a");
-      hiddenElement.href = "data:attachment/text," + encodeURI(textToSave);
-      hiddenElement.target = "_blank";
-      hiddenElement.download = "Event_Data.txt";
-      hiddenElement.click();
+    function beep() {
+      var audio = new Audio("beepsound.mp3");
+      audio.play();
     }
-    document.getElementById("test").addEventListener("click", download_txt);
+  
+
+    document.getElementById("test").addEventListener("click", function(){
+      event_name = document.getElementById("qrtitle").innerText
+      var table2excel = new Table2Excel();
+      table2excel.export(document.querySelectorAll("#table"),`${event_name}`);
+    });
+
     
     VANTA.TOPOLOGY({
             el: "html",
