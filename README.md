@@ -1,37 +1,69 @@
-### Qrify - Attendance Simplified
+# Qrify
 
-Qrify is a web application designed to simplify attendance tracking for events at college.
+Take attendance at events by scanning the QR code on the back of student ID cards.
 
-#### Technologies Used:
+Open it on a phone at the door, name the event, and point the camera at each card. Qrify beeps for a new check-in, flags anyone already in, and downloads the register as Excel or CSV when you're done. It works offline, and every record stays on the device.
 
-- **HTML**: The structure of the web pages is defined using HTML.
-- **CSS**: Styling and layout are handled using CSS for a visually appealing user interface.
-- **JavaScript**: Interactivity and functionality are implemented using JavaScript.
-- **Bootstrap**: The Bootstrap framework is used for responsive design and pre-built UI components.
-- **Three.js**: This library is used for creating 3D graphics in the background.
-- **p5.js**: p5.js is utilized for creative coding and visualization.
-- **Vanta.js**: Vanta.js provides the dynamic background effects seen on the website.
+**Live:** https://tarunkay7.github.io/Qrify
 
-#### Attendance Maker:
+## What it does
 
-Qrify features an attendance maker that utilizes session storage to store student information extracted from the QR code scanned at the back of their ID card. This information includes the student's roll number, year of study, email, and branch of study. The session storage ensures that this data persists even upon reloading the page, allowing for easy attendance tracking.
+- **Scans fast.** Uses the browser's native `BarcodeDetector` where available, and a bundled zxing-wasm decoder everywhere else (including iOS Safari). A card held in view is counted once.
+- **Catches repeats.** One check-in per person per event, enforced by the database; the second scan says when they first checked in.
+- **Never loses the list.** Check-ins are written to IndexedDB immediately, so a closed tab, reload or dead battery doesn't wipe the event. Removed someone by mistake? Undo.
+- **Works with bad Wi-Fi.** Installable PWA; the app and decoder are precached.
+- **Reads different ID formats.** The KLH preset derives email, department and year from the roll number. The "Any QR code" profile records raw contents for tickets or other cards.
 
-#### Attendance Management:
+## Architecture
 
-Organizers can easily download the attendance data as an Excel file, simplifying the process of marking attendance for events. This feature streamlines record-keeping and ensures accuracy in attendance tracking.
+A client-only SvelteKit app (static adapter, no server). Business rules are plain TypeScript with no framework or DOM dependencies, so they're unit tested directly.
 
-#### Hosting:
+```
+src/lib/
+  domain/     Pure logic: ID profiles, entry preparation, export tables
+  data/       Dexie (IndexedDB) schema and repository; live queries for Svelte
+  scanner/    Camera lifecycle, QR decode loop with cooldown, sound/haptic cues
+  export/     CSV (RFC 4180, BOM, formula-injection safe) and lazy-loaded XLSX
+  stores/     Settings (localStorage) and toasts, as Svelte 5 rune classes
+  ui/         Components: scanner view, register table, dialog, toaster
+src/routes/   Home (events), /events/[id] (scan session), /settings
+tests/        Playwright end-to-end tests with a fake camera that renders real QR codes
+```
 
-Qrify has been hosted using GitHub Pages and is available at [bit.ly/qrify](bit.ly/qrify). This allows for easy access to the application for event organizers and attendees.
+### Adding an ID card format
 
-#### Usage:
+Create a profile in `src/lib/domain/profiles/` implementing `IdProfile` (`normalize`, `validate`, `parse`, `columns`), then add it to the list in `profiles/index.ts`. Each event records the profile it started with, so changing the default doesn't affect existing events.
 
-1. Clone the repository: `git clone https://github.com/example/qrify.git`
-2. Open `index.html` in your preferred web browser.
-3. Follow the on-screen instructions to start using Qrify for attendance tracking.
+KLH department codes live in `profiles/klh.ts`. Unknown codes show as `Code NN` until they're added.
 
+## Development
 
-#### License:
+Requires Node 24.
 
-This project is licensed under the Apache License 2.0 - see the [LICENSE](LICENSE) file for details.
+```sh
+npm install
+npm run dev            # http://localhost:5173
+npm run test:unit      # Vitest: domain, export and data layers
+npm run test:e2e       # Playwright: desktop + mobile, builds first
+npm run lint && npm run check
+```
 
+The camera needs a secure context. `localhost` works; to try it on a phone over your LAN, use `npm run dev -- --host` with an HTTPS tunnel, or deploy.
+
+Screenshots of every screen in light and dark mode:
+
+```sh
+SHOTS_DIR=./shots npm run test:screens
+```
+
+## Deployment
+
+`.github/workflows/ci.yml` lints, type-checks, and runs unit and e2e tests on every push. On `main` it builds with `BASE_PATH=/Qrify` and deploys to GitHub Pages. In the repository settings, set **Pages → Source** to **GitHub Actions**.
+
+## History
+
+The original 2022 version (jQuery, Instascan, Vanta background) is preserved at the [`v1-legacy`](https://github.com/tarunkay7/Qrify/tree/v1-legacy) tag.
+
+## License
+
+Apache 2.0. See [LICENSE](LICENSE).
