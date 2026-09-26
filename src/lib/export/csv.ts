@@ -1,5 +1,6 @@
 import type { Table } from '$lib/domain/export';
 
+export const BOM = String.fromCharCode(0xfeff);
 const FORMULA_PREFIX = /^[=+\-@\t\r]/;
 
 function cell(value: string): string {
@@ -9,5 +10,5 @@ function cell(value: string): string {
 
 /** RFC 4180 CSV with a BOM, so Excel opens it as UTF-8. */
 export function toCsv({ header, rows }: Table): string {
-	return '﻿' + [header, ...rows].map((r) => r.map(cell).join(',') + '\r\n').join('');
+	return BOM + [header, ...rows].map((r) => r.map(cell).join(',') + '\r\n').join('');
 }

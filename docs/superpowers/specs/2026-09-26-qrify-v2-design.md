@@ -1,7 +1,9 @@
 # Qrify v2: Architectural Rebuild + Minimal Redesign
 
 ## Context
+
 Qrify (github.com/tarunkay7/Qrify) is a 3-year-old static 2-page site that lets college event organizers scan the QR on the back of a KLH student ID (which holds a 10-digit roll number), derive email/dept/year, and export attendance to Excel. It is currently:
+
 - **Broken**: the scanner loads from `rawgit.com` (shut down), so scanning doesn't work.
 - **Fragile**: data lives in `sessionStorage` (gone when the tab closes), with no delete/undo. `alert()` on duplicates blocks the scan loop.
 - **Bloated**: jQuery is loaded twice, and Three.js + p5 + Vanta (~1MB) are used only for a background. There's also a 515KB webpack `table2excel.js` bundle.
@@ -10,26 +12,29 @@ Qrify (github.com/tarunkay7/Qrify) is a 3-year-old static 2-page site that lets 
 Goal: a real, reliable tool that organizers use on phones at the door, and that also works as a portfolio piece. **Decisions (confirmed with user):** client-only PWA (no backend), SvelteKit + TypeScript, configurable ID parser (KLH preset), "Paper & ink" minimal aesthetic.
 
 ## Repo strategy
+
 - Clone to `C:\Users\Tarun Kesavan\Qrify`, tag the current `main` as `v1-legacy`, and work on branch `v2`.
 - Delete the legacy files (html/css/png/mp3/table2excel.js/txt) in v2. They stay available in history and under the tag.
 - First commit on v2: this design as `docs/superpowers/specs/2026-09-26-qrify-v2-design.md`.
 - Merge to main / deploy only when the user says so.
 
 ## Stack
-| Concern | Choice | Why |
-|---|---|---|
-| Framework | SvelteKit 2 + Svelte 5 (runes), TS strict | User's pick; small bundles |
-| Build/host | `@sveltejs/adapter-static` (SPA, `fallback: '404.html'`), `paths.base = '/Qrify'` | Free GitHub Pages hosting, deep links work |
-| QR decoding | `barcode-detector` ponyfill (uses native `BarcodeDetector` where available, zxing-wasm fallback) | Maintained, fast, works on iOS Safari |
-| Persistence | Dexie (IndexedDB), `liveQuery` → Svelte-compatible observables | Survives tab close/reload, supports compound unique index |
-| Export | CSV (native) + XLSX via `write-excel-file` (lazy `import()`) | Replaces the 515KB bundle; only loaded on click |
-| PWA/offline | `@vite-pwa/sveltekit` (precache app shell + wasm) | Works with bad venue Wi-Fi, installable |
-| Styling | Plain CSS design tokens (custom properties) + Svelte scoped styles; no UI framework | Minimal, full control, tiny |
-| Fonts | Self-hosted via `@fontsource` (display serif + text sans + mono) | No Google Fonts request, works offline |
-| Quality | ESLint (flat) + Prettier + `svelte-check`; Vitest; Playwright | Standard best practice |
-| CI/CD | GitHub Actions: lint, check, test, build → deploy to Pages on `main` | Replaces manual Pages |
+
+| Concern     | Choice                                                                                           | Why                                                       |
+| ----------- | ------------------------------------------------------------------------------------------------ | --------------------------------------------------------- |
+| Framework   | SvelteKit 2 + Svelte 5 (runes), TS strict                                                        | User's pick; small bundles                                |
+| Build/host  | `@sveltejs/adapter-static` (SPA, `fallback: '404.html'`), `paths.base = '/Qrify'`                | Free GitHub Pages hosting, deep links work                |
+| QR decoding | `barcode-detector` ponyfill (uses native `BarcodeDetector` where available, zxing-wasm fallback) | Maintained, fast, works on iOS Safari                     |
+| Persistence | Dexie (IndexedDB), `liveQuery` → Svelte-compatible observables                                   | Survives tab close/reload, supports compound unique index |
+| Export      | CSV (native) + XLSX via `write-excel-file` (lazy `import()`)                                     | Replaces the 515KB bundle; only loaded on click           |
+| PWA/offline | `@vite-pwa/sveltekit` (precache app shell + wasm)                                                | Works with bad venue Wi-Fi, installable                   |
+| Styling     | Plain CSS design tokens (custom properties) + Svelte scoped styles; no UI framework              | Minimal, full control, tiny                               |
+| Fonts       | Self-hosted via `@fontsource` (display serif + text sans + mono)                                 | No Google Fonts request, works offline                    |
+| Quality     | ESLint (flat) + Prettier + `svelte-check`; Vitest; Playwright                                    | Standard best practice                                    |
+| CI/CD       | GitHub Actions: lint, check, test, build → deploy to Pages on `main`                             | Replaces manual Pages                                     |
 
 ## Architecture
+
 Layered, framework code kept thin. Domain logic is pure TS and unit-testable.
 
 ```
@@ -71,26 +76,32 @@ tests/  (Playwright e2e)
 ```
 
 ### Data model
+
 - `Event { id (uuid), name, profileId, createdAt, updatedAt }`
 - `Attendee { id, eventId, key (normalized roll/raw), raw, fields: Record<string,string>, source: 'scan'|'manual', scannedAt }`
 - Unique compound index `[eventId+key]` enforces no duplicates at the DB level.
 
 ### IdProfile interface (the configurable parser)
+
 ```ts
 interface IdProfile {
-  id: string; name: string;
-  columns: { key: string; label: string }[];      // table + export columns
-  normalize(raw: string): string;                  // trim, uppercase, strip URL wrappers
-  validate(key: string): { ok: true } | { ok: false; reason: string };
-  parse(key: string): Record<string, string>;      // e.g. { email, dept, year }
+	id: string;
+	name: string;
+	columns: { key: string; label: string }[]; // table + export columns
+	normalize(raw: string): string; // trim, uppercase, strip URL wrappers
+	validate(key: string): { ok: true } | { ok: false; reason: string };
+	parse(key: string): Record<string, string>; // e.g. { email, dept, year }
 }
 ```
-- KLH preset: validate `/^\d{10}$/`; `year = 'Y' + key.slice(0,2)`; `dept = DEPT[key.slice(4,6)] ?? \`Code ${code}\`` (no more "undefined"); `email = \`${key}@klh.edu.in\``. The dept map is data in `klh.ts`, easy to extend.
+
+- KLH preset: validate `/^\d{10}$/`; `year = 'Y' + key.slice(0,2)`; `dept = DEPT[key.slice(4,6)] ?? \`Code ${code}\``(no more "undefined");`email = \`${key}@klh.edu.in\``. The dept map is data in `klh.ts`, easy to extend.
 - Generic preset: stores the raw value, with a single "Value" column.
 - Each event stores its `profileId`, so old events stay stable if defaults change.
 
 ### Scan flow
+
 camera frame → `decoder` (cooldown: ignore the same value for 2.5s) → `profile.normalize/validate` → `repo.addAttendee` → one of:
+
 - success: beep + vibrate, row slides in, count ticks up
 - duplicate: different tone, non-blocking toast "Already checked in at 10:42"
 - invalid: toast with the reason
@@ -98,6 +109,7 @@ camera frame → `decoder` (cooldown: ignore the same value for 2.5s) → `profi
 Manual entry goes through the same path. Each row has a delete button with an Undo toast. The camera stops when the tab is hidden or the user leaves the page.
 
 ### Best practices baked in
+
 - No blocking `alert()`. All errors are recoverable toasts. There's a camera-permission-denied state with instructions and a manual-entry fallback.
 - Accessibility: semantic table, labelled inputs, `aria-live` region announcing each check-in, visible focus, `prefers-reduced-motion`, and AA contrast in both themes.
 - Mobile-first: on phones the camera sits on top with the list below; on tablets and desktops they're side by side. Large touch targets.
@@ -105,7 +117,9 @@ Manual entry goes through the same path. Each row has a delete button with an Un
 - Performance budget: under 100KB JS for the initial route (excluding lazy wasm/xlsx). Lighthouse ≥ 95 on all categories.
 
 ## Visual design: "Paper & ink"
+
 During implementation, apply the **frontend-design skill** to the UI layer.
+
 - Palette: warm paper `#F5F1E8`-ish background, ink `#141414`, muted rule lines, and a single signal-red accent for scan success and the primary action. The dark theme inverts to warm charcoal/bone. Follows the system setting, with a manual toggle.
 - Type: an editorial serif for display (event names, big count), a clean grotesk for UI text, and mono with tabular numbers for roll numbers and the `#` column.
 - Motifs: ledger-style hairline rules, generous whitespace, and corner-bracket viewfinder marks on the camera. The "present" count is set large like a headline. No gradients, glows or 3D backgrounds.
@@ -114,6 +128,7 @@ During implementation, apply the **frontend-design skill** to the UI layer.
 - New SVG logo/favicon and PWA icons, replacing the PNGs.
 
 ## Build sequence (for writing-plans to expand into tasks)
+
 1. Clone, tag, branch, commit spec. Scaffold SvelteKit (TS, ESLint, Prettier, Vitest, Playwright), adapter-static, and base path. Add CI workflow.
 2. Domain: types, KLH and generic profiles, attendance rules, export rows (TDD with Vitest).
 3. Data: Dexie schema + repo (tests with `fake-indexeddb`).
@@ -124,6 +139,7 @@ During implementation, apply the **frontend-design skill** to the UI layer.
 8. Rewrite the README (screenshots, architecture, local dev). Pages deploy workflow.
 
 ## Verification
+
 - `npm run lint && npm run check && npm run test` all pass (unit coverage on domain/ and data/).
 - Playwright e2e, using Chromium with `--use-fake-device-for-media-stream --use-file-for-fake-video-capture=tests/fixtures/qr.y4m`, which renders a known KLH QR. Assert: a row appears, a rescan within cooldown is ignored, a later rescan shows the duplicate toast, the row survives reload, and CSV/XLSX download has the expected headers and rows.
 - Manual-entry e2e path (invalid roll → toast; valid → row; delete → undo restores).

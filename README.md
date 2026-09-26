@@ -30,8 +30,6 @@ Qrify has been hosted using GitHub Pages and is available at [bit.ly/qrify](bit.
 2. Open `index.html` in your preferred web browser.
 3. Follow the on-screen instructions to start using Qrify for attendance tracking.
 
-
 #### License:
 
 This project is licensed under the Apache License 2.0 - see the [LICENSE](LICENSE) file for details.
-
