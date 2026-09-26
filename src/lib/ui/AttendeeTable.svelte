@@ -145,5 +145,31 @@
 		.wide {
 			display: none;
 		}
+
+		th,
+		td {
+			padding-inline: 0.45rem;
+		}
+
+		.n {
+			width: 2.5rem;
+			padding-left: 0;
+		}
+
+		/* Mark typed entries with a small dot instead of the word on narrow screens. */
+		.typed {
+			font-size: 0;
+			margin-left: 0.35rem;
+		}
+
+		.typed::before {
+			content: '';
+			display: inline-block;
+			width: 0.35rem;
+			height: 0.35rem;
+			border-radius: 50%;
+			background: var(--pencil);
+			vertical-align: middle;
+		}
 	}
 </style>

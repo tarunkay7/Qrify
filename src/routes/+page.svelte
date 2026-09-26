@@ -77,11 +77,13 @@
 
 	{#if events.loaded && events.current?.length === 0}
 		<ol class="steps">
-			<li><strong>Name the event.</strong> Each event keeps its own list.</li>
+			<li><span><strong>Name the event.</strong> Each event keeps its own list.</span></li>
 			<li>
-				<strong>Scan each ID card.</strong> A beep confirms the check-in; repeats are caught.
+				<span
+					><strong>Scan each ID card.</strong> A beep confirms the check-in; repeats are caught.</span
+				>
 			</li>
-			<li><strong>Download the list</strong> as Excel or CSV when you’re done.</li>
+			<li><span><strong>Download the list</strong> as Excel or CSV when you’re done.</span></li>
 		</ol>
 	{:else if events.current}
 		<ul class="ledger">

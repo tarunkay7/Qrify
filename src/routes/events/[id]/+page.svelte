@@ -234,6 +234,11 @@
 		gap: 2rem;
 	}
 
+	/* Let the register scroll inside its column instead of widening the page. */
+	.session > * {
+		min-width: 0;
+	}
+
 	.capture {
 		display: grid;
 		gap: 0.5rem;
