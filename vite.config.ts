@@ -22,7 +22,8 @@ export default defineConfig({
 			base: `${base}/`,
 			scope: `${base}/`,
 			registerType: 'autoUpdate',
-			kit: { adapterFallback: '404.html', spa: true },
+			// Explicit: without it the plugin precaches index.html as the domain root, not the base.
+			kit: { base: `${base}/`, adapterFallback: '404.html', spa: true },
 			manifest: {
 				name: 'Qrify — attendance by ID card',
 				short_name: 'Qrify',

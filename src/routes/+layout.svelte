@@ -17,7 +17,10 @@
 	onMount(async () => {
 		if (!pwaInfo) return;
 		const { registerSW } = await import('virtual:pwa-register');
-		registerSW({ immediate: true });
+		registerSW({
+			immediate: true,
+			onRegisterError: (err) => console.error('Offline support unavailable:', err)
+		});
 	});
 
 	$effect(() => {
